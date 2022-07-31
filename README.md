@@ -18,5 +18,7 @@
 Just run;
 ```sh
 > ./create.sh UdagramApp infrastructure.yml infrastructure.json
-```
+```aws cloudformation create-stack --stack-name udagramApp --template-body file://infrastructure.yml --parameters file://infrastructure.json --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation update-stack --stack-name udagramApp --template-body file://infrastructure.yml --parameters file://infrastructure.json --capabilities CAPABILITY_NAMED_IAM
 # pAWS-cLoud-project2inUdacity

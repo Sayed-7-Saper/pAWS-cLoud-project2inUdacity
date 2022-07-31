@@ -1,6 +1,11 @@
 Description: >
-  Elsayed Saper / Udagram App
+    Elsayed Saper / Udacity
+    This template deploys a VPC, with a pair of public and private subnets spread 
+    across two Availabilty Zones. It deploys an Internet Gateway, with a default 
+    route on the public subnets. It deploys a pair of NAT Gateways (one in each AZ), 
+    and default routes for them in the private subnets.
 
+#update stack
 
 Parameters:
 
@@ -205,7 +210,7 @@ Resources:
             AssumeRolePolicyDocument:
                 Version: "2012-10-17"
                 Statement:
-                -   Effect: Allow
+                  - Effect: Allow
                     Principal:
                         Service:
                         - ec2.amazonaws.com
@@ -220,16 +225,15 @@ Resources:
           PolicyDocument:
               Version: '2012-10-17'
               Statement:
-              - 
-                  Effect: Allow
+                - Effect: Allow
                   Action: 
                   -   s3:Get*
                   -   s3:List*
                   Resource: 
-                  -   arn:aws:s3:::udacity-demo-1
-                  -   arn:aws:s3:::udacity-demo-1/*
+                  -   arn:aws:s3:::myproject2253059726560
+                  -   arn:aws:s3:::myproject2253059726560/*
           Roles:
-          -   Ref: UdacityS3ReadOnlyEC2
+          - Ref: UdacityS3ReadOnlyEC2
 
     ProfileWithRolesForOurApp:
       Type: AWS::IAM::InstanceProfile
@@ -278,11 +282,14 @@ Resources:
                 Fn::Base64: !Sub |
                     #!/bin/bash
                     apt-get update -y
+                    apt-get install unzip awscli -y
                     apt-get install apache2 -y
                     systemctl start apache2.service
                     cd var/www/html
-                    echo "it works ! Udgram App "> index.html
-            ImageId: ami-070650c005cce4203
+                    echo " it works ! Udgram App " >> index.html
+                    aws s3 cp s3://myproject2253059726560/index.zip .
+                    unzip -o index.zip                     
+            ImageId: ami-052efd3df9dad4825
             IamInstanceProfile: !Ref ProfileWithRolesForOurApp
             SecurityGroups:
             -   Ref: WebServerSecGroup
@@ -348,6 +355,7 @@ Resources:
                 Values: [/]
             ListenerArn: !Ref 'Listener'
             Priority: 1
+
 Outputs:
     VPC:
         Description: A reference to the created VPC
@@ -372,3 +380,5 @@ Outputs:
       Value: !Join [ "", [ 'http://', !GetAtt WebAppLB.DNSName ]]
       Export:
           Name: !Sub ${EnvironmentName}-LB-DNSName
+
+      
